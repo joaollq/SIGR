@@ -1,5 +1,6 @@
 import geolocaters.AbstractGeolocator;
 import geolocaters.TagMatchGeolocator;
+import geolocaters.TagMatchTermFrequencyGeolocator;
 
 
 public class SIGR {
