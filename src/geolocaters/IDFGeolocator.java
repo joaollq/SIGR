@@ -13,7 +13,7 @@ import java.util.Random;
 import photoRepresentation.LowerCaseTagRepresentation;
 import utils.Distance;
 
-public class TagMatchTermFrequencyGeolocator extends AbstractGeolocator {
+public class IDFGeolocator extends AbstractGeolocator {
 
 	private List<LowerCaseTagRepresentation> photos;
 
@@ -25,7 +25,7 @@ public class TagMatchTermFrequencyGeolocator extends AbstractGeolocator {
 
 	int totalImages;
 
-	public TagMatchTermFrequencyGeolocator(String featurespath,
+	public IDFGeolocator(String featurespath,
 			String metapath, String locationpath, float trainingSetSize) {
 		super(featurespath, metapath, locationpath, trainingSetSize);
 		photos = new LinkedList<LowerCaseTagRepresentation>();
@@ -90,8 +90,7 @@ public class TagMatchTermFrequencyGeolocator extends AbstractGeolocator {
 			List<LowerCaseTagRepresentation> matches = new LinkedList<LowerCaseTagRepresentation>();
 
 			for (Integer tag : tags) {
-				if (trainingSet.containsKey(tag)
-						&& trainingSet.get(tag).size() / totalImages < 0.5) {
+				if (trainingSet.containsKey(tag)) {
 					matches.addAll(trainingSet.get(tag));
 				}
 			}
@@ -150,7 +149,7 @@ public class TagMatchTermFrequencyGeolocator extends AbstractGeolocator {
 		BufferedReader locationReader = new BufferedReader(new FileReader(
 				locationpath));
 
-		HashMap<String, PhotoLocation> photoLocation = new HashMap<String, TagMatchTermFrequencyGeolocator.PhotoLocation>();
+		HashMap<String, PhotoLocation> photoLocation = new HashMap<String, IDFGeolocator.PhotoLocation>();
 
 		String line = null;
 		int imagesIgnored = 0;
