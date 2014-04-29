@@ -1,59 +1,15 @@
 package photoRepresentation;
 
 import java.util.LinkedList;
-import java.util.List;
 
-public class LowerCaseTagRepresentation {
-
-	private String id;
-	private List<Integer> tags;
-	private double realLat;
-	private double reatLon;
-	private double extimatedLat;
-	private double extimatedLon;
+public class LowerCaseTagRepresentation extends AbstractPhotoRepresentation {
 
 	public LowerCaseTagRepresentation(String id, String[] tags, double realLat,
-			double reatLon) {
-		super();
-		this.id = id;
+			double realLon) {
+		super(id, realLat, realLon);
 		this.tags = new LinkedList<Integer>();
 		for (String string : tags) {
 			this.tags.add(string.toLowerCase().hashCode());
 		}
-		this.realLat = realLat;
-		this.reatLon = reatLon;
 	}
-
-	public double getExtimatedLat() {
-		return extimatedLat;
-	}
-
-	public void setExtimatedLat(double extimatedLat) {
-		this.extimatedLat = extimatedLat;
-	}
-
-	public double getExtimatedLon() {
-		return extimatedLon;
-	}
-
-	public void setExtimatedLon(double extimatedLon) {
-		this.extimatedLon = extimatedLon;
-	}
-
-	public String getId() {
-		return id;
-	}
-
-	public List<Integer> getTags() {
-		return tags;
-	}
-
-	public double getRealLat() {
-		return realLat;
-	}
-
-	public double getRealLon() {
-		return reatLon;
-	}
-
 }
