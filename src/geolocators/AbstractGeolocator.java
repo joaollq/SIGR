@@ -1,4 +1,4 @@
-package geolocaters;
+package geolocators;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -21,20 +21,22 @@ public abstract class AbstractGeolocator {
 	protected String metapath;
 	protected String locationpath;
 	protected int totalImages;
-	protected float trainingSetSize;
+	protected float trainingPercentege;
+	protected int photosInTrainingSet;
 
 	protected List<AbstractPhotoRepresentation> photos;
 	protected List<AbstractPhotoRepresentation> results;
 	protected HashMap<Integer, List<AbstractPhotoRepresentation>> trainingSet;
 
 	public AbstractGeolocator(String featurespath, String metapath,
-			String locationpath, float trainingSetSize) {
+			String locationpath, float trainingPercentage) {
 		super();
 		this.totalImages = 0;
+		this.photosInTrainingSet = 0;
 		this.featurespath = featurespath;
 		this.metapath = metapath;
 		this.locationpath = locationpath;
-		this.trainingSetSize = trainingSetSize;
+		this.trainingPercentege = trainingPercentage;
 		this.results = new LinkedList<AbstractPhotoRepresentation>();
 		this.photos = new LinkedList<AbstractPhotoRepresentation>();
 		this.trainingSet = new HashMap<Integer, List<AbstractPhotoRepresentation>>();
@@ -42,15 +44,11 @@ public abstract class AbstractGeolocator {
 
 	public void run() {
 		try {
-			System.out.println("Starting program");
+			System.out.println("Started " + getName());
 			InitializePhotos();
-			System.out.println("Initialized photos. Found " + totalImages);
-			System.out.println("Going to generate training set");
 			GenerateTrainingSet();
-			System.out.println("Training set generated");
-			System.out.println("Going to test the model");
 			Test();
-			System.out.println("Tested the model");
+			System.out.println("Results for " + getName());
 			AnalyseResults();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -108,10 +106,10 @@ public abstract class AbstractGeolocator {
 			kmError.add(distance);
 		}
 
-		System.out.println("Latitude error (in degrees) = " + latError
+		System.out.println("Avg latitude error (in degrees) = " + latError
 				/ results.size());
 
-		System.out.println("Longitude error (in degrees) = " + lonError
+		System.out.println("Avg longitude error (in degrees) = " + lonError
 				/ results.size());
 
 		Collections.sort(kmError);
@@ -146,19 +144,17 @@ public abstract class AbstractGeolocator {
 		plot.addLinePlot("Error", xAxis, yAxis);
 		plot.setAxisLabel(1, "Km");
 
-		JFrame frame = new JFrame("Error plot");
-		frame.setSize(400, 400);
+		JFrame frame = new JFrame("Error plot for " + getName());
+		frame.setSize(700, 700);
 		frame.setContentPane(plot);
 		frame.setVisible(true);
 	}
 
 	protected void GenerateTrainingSet() {
-		int imagesForTraining = (int) (photos.size() * trainingSetSize);
+		int imagesForTraining = (int) (photos.size() * trainingPercentege);
 		Random random = new Random(new Date().getTime());
 
 		while (imagesForTraining > 0) {
-			System.out.println("Images until training set finished = "
-					+ imagesForTraining);
 
 			AbstractPhotoRepresentation selectedPhoto = photos.remove(random
 					.nextInt(photos.size()));
@@ -172,9 +168,10 @@ public abstract class AbstractGeolocator {
 				}
 				trainingSet.get(tag).add(selectedPhoto);
 			}
-
+			photosInTrainingSet++;
 			imagesForTraining--;
 		}
-
 	}
+	
+	protected abstract String getName();
 }

@@ -3,5 +3,12 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="C:/Users/João/workspace/SIGR/jmathplot.jar"/>
+	<classpathentry kind="lib" path="C:/Users/João/workspace/SIGR/acme.jar"/>
+	<classpathentry kind="lib" path="C:/Users/João/workspace/SIGR/jdom.jar"/>
+	<classpathentry kind="lib" path="C:/Users/João/workspace/SIGR/JTS_Test.jar"/>
+	<classpathentry kind="lib" path="C:/Users/João/workspace/SIGR/jts-1.8.jar"/>
+	<classpathentry kind="lib" path="C:/Users/João/workspace/SIGR/jtsio-1.8.jar"/>
+	<classpathentry kind="lib" path="C:/Users/João/workspace/SIGR/junit.jar"/>
+	<classpathentry kind="lib" path="C:/Users/João/workspace/SIGR/xerces.jar"/>
 	<classpathentry kind="output" path="bin1"/>
 </classpath>

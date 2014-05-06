@@ -1,4 +1,4 @@
-package geolocaters;
+package geolocators;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -11,17 +11,16 @@ import photoRepresentation.AbstractPhotoRepresentation;
 import photoRepresentation.LowerCaseTagRepresentation;
 import utils.PhotoLocation;
 
-public class IDFGeolocator extends AbstractGeolocator {
+public class TagMatchTermFrequencyGeolocator extends AbstractGeolocator {
 
-	int totalImages;
 
-	public IDFGeolocator(String featurespath,
+	public TagMatchTermFrequencyGeolocator(String featurespath,
 			String metapath, String locationpath, float trainingSetSize) {
 		super(featurespath, metapath, locationpath, trainingSetSize);
 	}
 
+	
 	protected void Test() {
-		int ignored = 0;
 		while (!photos.isEmpty()) {
 			AbstractPhotoRepresentation selectedPhoto = photos.remove(0);
 
@@ -29,21 +28,16 @@ public class IDFGeolocator extends AbstractGeolocator {
 			List<AbstractPhotoRepresentation> matches = new LinkedList<AbstractPhotoRepresentation>();
 
 			for (Integer tag : tags) {
-				if (trainingSet.containsKey(tag)) {
+				if (trainingSet.containsKey(tag)
+						&& trainingSet.get(tag).size() / totalImages < 0.5) {
 					matches.addAll(trainingSet.get(tag));
 				}
 			}
 
 			if (!matches.isEmpty()) {
 				calculateExtimatedCoordinates(selectedPhoto, matches);
-			} else {
-				ignored++;
 			}
-			System.out.println("Remaining photos to be tested = "
-					+ photos.size());
 		}
-
-		System.out.println("Found " + ignored + " photos without matches");
 	}
 
 	
@@ -56,7 +50,6 @@ public class IDFGeolocator extends AbstractGeolocator {
 		HashMap<String, PhotoLocation> photoLocation = new HashMap<String, PhotoLocation>();
 
 		String line = null;
-		int imagesIgnored = 0;
 
 		while ((line = locationReader.readLine()) != null) {
 			String[] linesplit = line.split(" ");
@@ -74,14 +67,16 @@ public class IDFGeolocator extends AbstractGeolocator {
 						.split(" "), photoLocation.get(id).getLat(),
 						photoLocation.get(id).getLon()));
 				totalImages++;
-			} else {
-				imagesIgnored++;
 			}
 		}
 
 		metaReader.close();
 		locationReader.close();
-		System.out.println("Found " + imagesIgnored + " without tags");
 
+	}
+
+	@Override
+	protected String getName() {
+		return "Tag Match Term Frequency";
 	}
 }

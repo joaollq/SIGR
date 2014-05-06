@@ -1,71 +1,72 @@
-package geolocaters;
+package geolocators;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 
 import photoRepresentation.AbstractPhotoRepresentation;
 import photoRepresentation.LowerCaseTagRepresentation;
 import utils.PhotoLocation;
 
-public class TagMatchTermFrequencyGeolocator extends AbstractGeolocator {
+public class IDFGeolocator extends AbstractGeolocator {
 
+	int totalImages;
 
-	public TagMatchTermFrequencyGeolocator(String featurespath,
-			String metapath, String locationpath, float trainingSetSize) {
+	public IDFGeolocator(String featurespath, String metapath,
+			String locationpath, float trainingSetSize) {
 		super(featurespath, metapath, locationpath, trainingSetSize);
 	}
 
-	@Override
-	public void run() {
-		try {
-			System.out.println("Starting program");
-			InitializePhotos();
-			System.out.println("Initialized photos. Found " + totalImages);
-			System.out.println("Going to generate training set");
-			GenerateTrainingSet();
-			System.out.println("Training set generated");
-			System.out.println("Going to test the model");
-			Test();
-			System.out.println("Tested the model");
-			AnalyseResults();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-
 	protected void Test() {
-		int ignored = 0;
 		while (!photos.isEmpty()) {
 			AbstractPhotoRepresentation selectedPhoto = photos.remove(0);
+			double accumulatedIDF = 0;
+			int matches = 0;
+
+			double extimatedLat = 0;
+			double extimatedLon = 0;
 
 			List<Integer> tags = selectedPhoto.getTags();
-			List<AbstractPhotoRepresentation> matches = new LinkedList<AbstractPhotoRepresentation>();
 
 			for (Integer tag : tags) {
-				if (trainingSet.containsKey(tag)
-						&& trainingSet.get(tag).size() / totalImages < 0.5) {
-					matches.addAll(trainingSet.get(tag));
+				if (trainingSet.containsKey(tag)) {
+					double idf = Math.log(photosInTrainingSet
+							/ trainingSet.get(tag).size());
+					for (AbstractPhotoRepresentation photo : trainingSet
+							.get(tag)) {
+						matches++;
+						double x = Math.cos(photo.getRealLat()
+								* (Math.PI / 180))
+								* Math.cos(photo.getRealLon() * (Math.PI / 180));
+						double y = Math.cos(photo.getRealLat()
+								* (Math.PI / 180))
+								* Math.sin(photo.getRealLon() * (Math.PI / 180));
+						double z = Math.sin(photo.getRealLat()
+								* (Math.PI / 180));
+
+						extimatedLon += Math.atan2(y, x) * (idf)
+								* (180 / Math.PI);
+						double hyp = Math.sqrt(x * x + y * y);
+						extimatedLat += Math.atan2(z, hyp) * idf
+								* (180 / Math.PI);
+						accumulatedIDF += idf;
+					}
 				}
 			}
 
-			if (!matches.isEmpty()) {
-				calculateExtimatedCoordinates(selectedPhoto, matches);
-			} else {
-				ignored++;
+			if (matches > 0) {
+				extimatedLat = extimatedLat / accumulatedIDF;
+				extimatedLon = extimatedLon / accumulatedIDF;
+
+				selectedPhoto.setExtimatedLat(extimatedLat);
+				selectedPhoto.setExtimatedLon(extimatedLon);
+
+				results.add(selectedPhoto);
 			}
-			System.out.println("Remaining photos to be tested = "
-					+ photos.size());
 		}
-
-		System.out.println("Found " + ignored + " photos without matches");
 	}
-
-	
 
 	protected void InitializePhotos() throws IOException {
 		BufferedReader metaReader = new BufferedReader(new FileReader(metapath));
@@ -75,8 +76,6 @@ public class TagMatchTermFrequencyGeolocator extends AbstractGeolocator {
 		HashMap<String, PhotoLocation> photoLocation = new HashMap<String, PhotoLocation>();
 
 		String line = null;
-		int imagesIgnored = 0;
-
 		while ((line = locationReader.readLine()) != null) {
 			String[] linesplit = line.split(" ");
 			photoLocation.put(
@@ -93,14 +92,15 @@ public class TagMatchTermFrequencyGeolocator extends AbstractGeolocator {
 						.split(" "), photoLocation.get(id).getLat(),
 						photoLocation.get(id).getLon()));
 				totalImages++;
-			} else {
-				imagesIgnored++;
-			}
+			} 
 		}
 
 		metaReader.close();
 		locationReader.close();
-		System.out.println("Found " + imagesIgnored + " without tags");
+	}
 
+	@Override
+	protected String getName() {
+		return "IDF Geolocator";
 	}
 }

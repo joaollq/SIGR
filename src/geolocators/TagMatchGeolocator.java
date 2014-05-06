@@ -1,4 +1,4 @@
-package geolocaters;
+package geolocators;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -21,7 +21,6 @@ public class TagMatchGeolocator extends AbstractGeolocator {
 	}
 
 	protected void Test() {
-		int ignored = 0;
 		while (!photos.isEmpty()) {
 			AbstractPhotoRepresentation selectedPhoto = photos.remove(0);
 
@@ -36,13 +35,8 @@ public class TagMatchGeolocator extends AbstractGeolocator {
 
 			if (!matches.isEmpty()) {
 				calculateExtimatedCoordinates(selectedPhoto, matches);
-			} else {
-				ignored++;
 			}
-			System.out.println("Remaining photos to be tested = " + photos.size());
 		}
-
-		System.out.println("Found " + ignored + " photos without matches");
 	}
 
 	protected void InitializePhotos() throws IOException {
@@ -53,7 +47,6 @@ public class TagMatchGeolocator extends AbstractGeolocator {
 		HashMap<String, PhotoLocation> photoLocation = new HashMap<String, PhotoLocation>();
 
 		String line = null;
-		int imagesIgnored = 0;
 
 		while ((line = locationReader.readLine()) != null) {
 			String[] linesplit = line.split(" ");
@@ -71,15 +64,16 @@ public class TagMatchGeolocator extends AbstractGeolocator {
 						photoLocation.get(id).getLat(), photoLocation.get(id)
 								.getLon()));
 				totalImages++;
-			} else {
-				imagesIgnored++;
 			}
 		}
 
 		metaReader.close();
 		locationReader.close();
-		System.out.println("Found " + imagesIgnored + " without tags");
+	}
 
+	@Override
+	protected String getName() {
+		return "Tag Match Geolocator";
 	}
 
 }
