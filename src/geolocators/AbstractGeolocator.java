@@ -93,6 +93,7 @@ public abstract class AbstractGeolocator {
 		double latError = 0;
 		double lonError = 0;
 		List<Double> kmError = new LinkedList<Double>();
+		int []bins = new int[5];
 
 		for (AbstractPhotoRepresentation photo : results) {
 			latError += Math.abs(photo.getRealLat() - photo.getExtimatedLat());
@@ -116,14 +117,19 @@ public abstract class AbstractGeolocator {
 		double avgKm = 0;
 
 		for (double double1 : kmError) {
-			if(Double.isNaN(double1)) {
-				System.out.println(double1);
-			} else {
 				avgKm += double1;
-			}
-			if(Double.isNaN(avgKm)) {
-				System.out.println(double1);
-			}
+				if(double1 < 0.05) {
+					bins[0]++;
+				} else if (double1 < 0.25) {
+					bins[1]++;
+				} else if (double1 < 1) {
+					bins[2]++;
+				} else if(double1 < 10) {
+					bins[3]++;
+				} else if (double1 < 50) {
+					bins[4]++;
+				}
+					
 		}
 
 		System.out.println("Avg error (in km) = " + avgKm / kmError.size());
@@ -131,6 +137,12 @@ public abstract class AbstractGeolocator {
 		System.out.println("Median error (in km) = "
 				+ kmError.get(kmError.size() / 2));
 
+		System.out.println("Number of points within less than 50 m = " + bins[0]);
+		System.out.println("Number of points between 50 m and 250 m = " + bins[1]);
+		System.out.println("Number of points between 250 m and 1 km = " + bins[2]);
+		System.out.println("Number of points between 1 km and 10 km = " + bins[3]);
+		System.out.println("Number of points between 10 km and 50 km = " + bins[4]);
+		
 		Plot2DPanel plot = new Plot2DPanel();
 
 		double[] yAxis = new double[kmError.size()];

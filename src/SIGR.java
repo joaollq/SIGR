@@ -14,7 +14,7 @@ public class SIGR {
 	private static final float TRAININGSIZE = (float) 0.9;
 	static double LAT = 38.725670;
 	static double LON =  -9.150370;
-	static double BUFFER = 1;
+	static double BUFFER = 0.5;
 
 	public static void main(String[] args) {
 		try {
