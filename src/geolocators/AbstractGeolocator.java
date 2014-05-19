@@ -15,8 +15,6 @@ import java.util.Random;
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 
-import org.math.plot.Plot2DPanel;
-
 import photoRepresentation.AbstractPhotoRepresentation;
 import utils.Distance;
 
@@ -28,18 +26,20 @@ public abstract class AbstractGeolocator {
     protected int totalImages;
     protected float trainingPercentege;
     protected int photosInTrainingSet;
+    protected String graphName;
 
     protected List<AbstractPhotoRepresentation> photos;
     protected List<AbstractPhotoRepresentation> results;
     protected HashMap<Integer, List<AbstractPhotoRepresentation>> trainingSet;
 
-    public AbstractGeolocator(BufferedWriter bw, String metapath, String locationpath, float trainingPercentage) {
+    public AbstractGeolocator(BufferedWriter bw, String metapath, String locationpath, float trainingPercentage, String graphName) {
         super();
         this.totalImages = 0;
         this.photosInTrainingSet = 0;
         this.bw = bw;
         this.metapath = metapath;
         this.locationpath = locationpath;
+        this.graphName = graphName;
         this.trainingPercentege = trainingPercentage;
         this.results = new LinkedList<AbstractPhotoRepresentation>();
         this.photos = new LinkedList<AbstractPhotoRepresentation>();
@@ -94,7 +94,7 @@ public abstract class AbstractGeolocator {
         double latError = 0;
         double lonError = 0;
         List<Double> kmError = new LinkedList<Double>();
-        int[] bins = new int[5];
+        int[] bins = new int[6];
 
         for (AbstractPhotoRepresentation photo : results) {
             latError += Math.abs(photo.getRealLat() - photo.getExtimatedLat());
@@ -123,10 +123,13 @@ public abstract class AbstractGeolocator {
                 bins[3]++;
             } else if (double1 < 50) {
                 bins[4]++;
+            } else {
+                bins[5]++;
             }
 
         }
 
+        bw.write("Total images = " + totalImages + "\n");
         bw.write("Avg error (in km) = " + avgKm / kmError.size() + "\n");
 
         bw.write("Median error (in km) = " + kmError.get(kmError.size() / 2) + "\n");
@@ -136,6 +139,7 @@ public abstract class AbstractGeolocator {
         bw.write("Number of points between 250 m and 1 km = " + bins[2] + "\n");
         bw.write("Number of points between 1 km and 10 km = " + bins[3] + "\n");
         bw.write("Number of points between 10 km and 50 km = " + bins[4] + "\n");
+        bw.write("Number of points at more than 50 km km = " + bins[5] + "\n");
 
         Plot2DPanel plot = new Plot2DPanel();
 
@@ -157,7 +161,7 @@ public abstract class AbstractGeolocator {
         BufferedImage image = new BufferedImage(700, 700, BufferedImage.TYPE_INT_RGB);
         Graphics2D graphics = image.createGraphics();
         frame.paint(graphics);
-        ImageIO.write(image, "png", new File("plots/graph");
+        ImageIO.write(image, "png", new File("plots//" + graphName));
     }
 
     protected void GenerateTrainingSet() {

@@ -15,8 +15,8 @@ public class IDFGeolocator extends AbstractGeolocator {
 
     int totalImages;
 
-    public IDFGeolocator(BufferedWriter bw, String metapath, String locationpath, float trainingSetSize) {
-        super(bw, metapath, locationpath, trainingSetSize);
+    public IDFGeolocator(BufferedWriter bw, String metapath, String locationpath, float trainingSetSize, String graphName) {
+        super(bw, metapath, locationpath, trainingSetSize, graphName);
     }
 
     @Override

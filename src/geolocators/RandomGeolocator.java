@@ -18,8 +18,8 @@ public class RandomGeolocator extends AbstractGeolocator {
     double limit = 1.5;
 
     public RandomGeolocator(BufferedWriter bw, String metapath, String locationpath, float trainingPercentage, double lat,
-            double lon, double limit) {
-        super(bw, metapath, locationpath, trainingPercentage);
+            double lon, double limit, String graphName) {
+        super(bw, metapath, locationpath, trainingPercentage, graphName);
         this.lat = lat;
         this.lon = lon;
         this.limit = limit;

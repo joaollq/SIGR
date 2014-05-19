@@ -24,34 +24,35 @@ public class SIGR {
         String[] fileName = { "ny", "lisbon" };
 
         for (int j = 0; j < lat.length; j++) {
+            try {
+                LatLgnCleaner.run(lat[j], lon[j], 1.5);
+                MetaCleaner.run();
 
-            for (float size : trainingSize) {
+                for (float size : trainingSize) {
 
-                try {
-                    LatLgnCleaner.run(lat[j], lon[j], 1.5);
-                    MetaCleaner.run();
                     File output = new File("docs//" + fileName[j] + "_" + size);
 
                     output.createNewFile();
 
                     BufferedWriter bw = new BufferedWriter(new FileWriter(output));
                     AbstractGeolocator geolocator;
-                    geolocator = new RandomGeolocator(bw, "meta.csv", "latlon", size, lat[j], lon[j], 1.5);
+                    geolocator =
+                            new RandomGeolocator(bw, "meta.csv", "latlon", size, lat[j], lon[j], 1.5, fileName[j] + "_" + size);
                     geolocator.run();
                     bw.write("\n #### \n");
-                    geolocator = new TagMatchGeolocator(bw, "meta.csv", "latlon", size);
+                    geolocator = new TagMatchGeolocator(bw, "meta.csv", "latlon", size, fileName[j] + "_" + size);
                     geolocator.run();
                     bw.write("\n #### \n");
-                    geolocator = new IDFGeolocator(bw, "meta.csv", "latlon", size);
+                    geolocator = new IDFGeolocator(bw, "meta.csv", "latlon", size, fileName[j] + "_" + size);
                     geolocator.run();
                     bw.write("\n #### \n");
-                    geolocator = new InverseConvexHullAreaGeolocator(bw, "meta.csv", "latlon", size);
+                    geolocator = new InverseConvexHullAreaGeolocator(bw, "meta.csv", "latlon", size, fileName[j] + "_" + size);
                     geolocator.run();
                     bw.write("\n\n");
                     bw.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
                 }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }
