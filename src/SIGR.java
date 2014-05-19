@@ -4,36 +4,55 @@ import geolocators.InverseConvexHullAreaGeolocator;
 import geolocators.RandomGeolocator;
 import geolocators.TagMatchGeolocator;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 
 import cleaners.LatLgnCleaner;
 import cleaners.MetaCleaner;
 
-
 public class SIGR {
-	private static final float TRAININGSIZE = (float) 0.9;
-	static double LAT = 38.725670;
-	static double LON =  -9.150370;
-	static double BUFFER = 0.5;
+    static double BUFFER = 1.5;
 
-	public static void main(String[] args) {
-		try {
-			LatLgnCleaner.run(LAT, LON, BUFFER);
-			MetaCleaner.run();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		AbstractGeolocator geolocator;
-		geolocator = new RandomGeolocator(null, "C:\\Users\\João\\workspace\\SIGR\\meta.csv", "C:\\Users\\João\\workspace\\SIGR\\latlon", TRAININGSIZE);
-		geolocator.run();
-		System.out.println("\n #### \n");
-		geolocator = new TagMatchGeolocator(null, "C:\\Users\\João\\workspace\\SIGR\\meta.csv", "C:\\Users\\João\\workspace\\SIGR\\latlon", TRAININGSIZE);
-		geolocator.run();
-		System.out.println("\n #### \n");
-		geolocator = new IDFGeolocator(null, "C:\\Users\\João\\workspace\\SIGR\\meta.csv", "C:\\Users\\João\\workspace\\SIGR\\latlon", TRAININGSIZE);
-		geolocator.run();
-		System.out.println("\n #### \n");
-		geolocator = new InverseConvexHullAreaGeolocator(null, "C:\\Users\\João\\workspace\\SIGR\\meta.csv", "C:\\Users\\João\\workspace\\SIGR\\latlon", TRAININGSIZE);
-		geolocator.run();
-	}
+    public static void main(String[] args) {
+
+        double[] lat = { 40.714550, 38.725670 };
+        double[] lon = { -74.007118, -9.150370 };
+        float[] trainingSize = { (float) 0.95, (float) 0.9, (float) 0.8, (float) 0.7, (float) 0.5 };
+
+        String[] fileName = { "ny", "lisbon" };
+
+        for (int j = 0; j < lat.length; j++) {
+
+            for (float size : trainingSize) {
+
+                try {
+                    LatLgnCleaner.run(lat[j], lon[j], 1.5);
+                    MetaCleaner.run();
+                    File output = new File("docs//" + fileName[j] + "_" + size);
+
+                    output.createNewFile();
+
+                    BufferedWriter bw = new BufferedWriter(new FileWriter(output));
+                    AbstractGeolocator geolocator;
+                    geolocator = new RandomGeolocator(bw, "meta.csv", "latlon", size, lat[j], lon[j], 1.5);
+                    geolocator.run();
+                    bw.write("\n #### \n");
+                    geolocator = new TagMatchGeolocator(bw, "meta.csv", "latlon", size);
+                    geolocator.run();
+                    bw.write("\n #### \n");
+                    geolocator = new IDFGeolocator(bw, "meta.csv", "latlon", size);
+                    geolocator.run();
+                    bw.write("\n #### \n");
+                    geolocator = new InverseConvexHullAreaGeolocator(bw, "meta.csv", "latlon", size);
+                    geolocator.run();
+                    bw.write("\n\n");
+                    bw.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
 }

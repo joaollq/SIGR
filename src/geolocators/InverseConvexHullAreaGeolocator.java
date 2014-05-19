@@ -1,6 +1,7 @@
 package geolocators;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
@@ -21,116 +22,105 @@ import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
 
 public class InverseConvexHullAreaGeolocator extends AbstractGeolocator {
 
-	Map<Integer, Double> area;
-	
-	public InverseConvexHullAreaGeolocator(String featurespath, String metapath,
-			String locationpath, float trainingPercentage) {
-		super(featurespath, metapath, locationpath, trainingPercentage);
-		area = new HashMap<Integer, Double>();
-	}
+    Map<Integer, Double> area;
 
-	@Override
-	protected void InitializePhotos() throws IOException {
-		BufferedReader metaReader = new BufferedReader(new FileReader(metapath));
-		BufferedReader locationReader = new BufferedReader(new FileReader(
-				locationpath));
+    public InverseConvexHullAreaGeolocator(BufferedWriter bw, String metapath, String locationpath, float trainingPercentage) {
+        super(bw, metapath, locationpath, trainingPercentage);
+        area = new HashMap<Integer, Double>();
+    }
 
-		HashMap<String, PhotoLocation> photoLocation = new HashMap<String, PhotoLocation>();
+    @Override
+    protected void InitializePhotos() throws IOException {
+        BufferedReader metaReader = new BufferedReader(new FileReader(metapath));
+        BufferedReader locationReader = new BufferedReader(new FileReader(locationpath));
 
-		String line = null;
-		while ((line = locationReader.readLine()) != null) {
-			String[] linesplit = line.split(" ");
-			photoLocation.put(
-					linesplit[0],
-					new PhotoLocation(Double.parseDouble(linesplit[1]), Double
-							.parseDouble(linesplit[2])));
-		}
+        HashMap<String, PhotoLocation> photoLocation = new HashMap<String, PhotoLocation>();
 
-		while ((line = metaReader.readLine()) != null) {
-			String[] linesplit = line.split(",");
-			if (linesplit[4].startsWith("\"") && !linesplit[4].equals("\"\"")) {
-				String id = linesplit[0];
-				photos.add(new LowerCaseTagRepresentation(id, linesplit[4]
-						.split(" "), photoLocation.get(id).getLat(),
-						photoLocation.get(id).getLon()));
-				totalImages++;
-			} 
-		}
+        String line = null;
+        while ((line = locationReader.readLine()) != null) {
+            String[] linesplit = line.split(" ");
+            photoLocation
+                    .put(linesplit[0], new PhotoLocation(Double.parseDouble(linesplit[1]), Double.parseDouble(linesplit[2])));
+        }
 
-		metaReader.close();
-		locationReader.close();
-	}
-	
-	@Override
-	protected void GenerateTrainingSet() {
-		super.GenerateTrainingSet();
-		GeometryFactory factory = new GeometryFactory();
-		for (Integer tag : trainingSet.keySet()) {
-			int i = 0;
-			Geometry[] points = new Geometry[trainingSet.get(tag).size()];
-			for (AbstractPhotoRepresentation photo : trainingSet.get(tag)) {
-				Coordinate[] coordinates = new Coordinate[1];
-				coordinates[0] = new Coordinate(photo.getRealLon(), photo.getRealLat());
-				points[i++] = new Point(new CoordinateArraySequence(coordinates), factory);
-			}
-			Geometry geometry = new GeometryCollection(points, factory);
-			ConvexHull hull = new ConvexHull(geometry);
-			area.put(tag, hull.getConvexHull().getArea());
-		}		
-	};
+        while ((line = metaReader.readLine()) != null) {
+            String[] linesplit = line.split(",");
+            if (linesplit[4].startsWith("\"") && !linesplit[4].equals("\"\"")) {
+                String id = linesplit[0];
+                photos.add(new LowerCaseTagRepresentation(id, linesplit[4].split(" "), photoLocation.get(id).getLat(),
+                        photoLocation.get(id).getLon()));
+                totalImages++;
+            }
+        }
 
-	@Override
-	protected void Test() {
-		while (!photos.isEmpty()) {
-			AbstractPhotoRepresentation selectedPhoto = photos.remove(0);
-			double accumulatedArea = 0;
-			int matches = 0;
+        metaReader.close();
+        locationReader.close();
+    }
 
-			double extimatedLat = 0;
-			double extimatedLon = 0;
+    @Override
+    protected void GenerateTrainingSet() {
+        super.GenerateTrainingSet();
+        GeometryFactory factory = new GeometryFactory();
+        for (Integer tag : trainingSet.keySet()) {
+            int i = 0;
+            Geometry[] points = new Geometry[trainingSet.get(tag).size()];
+            for (AbstractPhotoRepresentation photo : trainingSet.get(tag)) {
+                Coordinate[] coordinates = new Coordinate[1];
+                coordinates[0] = new Coordinate(photo.getRealLon(), photo.getRealLat());
+                points[i++] = new Point(new CoordinateArraySequence(coordinates), factory);
+            }
+            Geometry geometry = new GeometryCollection(points, factory);
+            ConvexHull hull = new ConvexHull(geometry);
+            area.put(tag, hull.getConvexHull().getArea());
+        }
+    };
 
-			List<Integer> tags = selectedPhoto.getTags();
+    @Override
+    protected void Test() {
+        while (!photos.isEmpty()) {
+            AbstractPhotoRepresentation selectedPhoto = photos.remove(0);
+            double accumulatedArea = 0;
+            int matches = 0;
 
-			for (Integer tag : tags) {
-				if (trainingSet.containsKey(tag)) {
-					double hullArea = 1 / (area.get(tag) + 1);
-					for (AbstractPhotoRepresentation photo : trainingSet
-							.get(tag)) {
-						matches++;
-						double x = Math.cos(photo.getRealLat()
-								* (Math.PI / 180))
-								* Math.cos(photo.getRealLon() * (Math.PI / 180));
-						double y = Math.cos(photo.getRealLat()
-								* (Math.PI / 180))
-								* Math.sin(photo.getRealLon() * (Math.PI / 180));
-						double z = Math.sin(photo.getRealLat()
-								* (Math.PI / 180));
+            double extimatedLat = 0;
+            double extimatedLon = 0;
 
-						extimatedLon += Math.atan2(y, x) * (hullArea)
-								* (180 / Math.PI);
-						double hyp = Math.sqrt(x * x + y * y);
-						extimatedLat += Math.atan2(z, hyp) * hullArea
-								* (180 / Math.PI);
-						accumulatedArea += hullArea;
-					}
-				}
-			}
+            List<Integer> tags = selectedPhoto.getTags();
 
-			if (matches > 0) {
-				extimatedLat = extimatedLat / accumulatedArea;
-				extimatedLon = extimatedLon / accumulatedArea;
+            for (Integer tag : tags) {
+                if (trainingSet.containsKey(tag)) {
+                    double hullArea = 1 / (area.get(tag) + 1);
+                    for (AbstractPhotoRepresentation photo : trainingSet.get(tag)) {
+                        matches++;
+                        double x =
+                                Math.cos(photo.getRealLat() * (Math.PI / 180)) * Math.cos(photo.getRealLon() * (Math.PI / 180));
+                        double y =
+                                Math.cos(photo.getRealLat() * (Math.PI / 180)) * Math.sin(photo.getRealLon() * (Math.PI / 180));
+                        double z = Math.sin(photo.getRealLat() * (Math.PI / 180));
 
-				selectedPhoto.setExtimatedLat(extimatedLat);
-				selectedPhoto.setExtimatedLon(extimatedLon);
+                        extimatedLon += Math.atan2(y, x) * (hullArea) * (180 / Math.PI);
+                        double hyp = Math.sqrt(x * x + y * y);
+                        extimatedLat += Math.atan2(z, hyp) * hullArea * (180 / Math.PI);
+                        accumulatedArea += hullArea;
+                    }
+                }
+            }
 
-				results.add(selectedPhoto);
-			}
-		}
-	}
+            if (matches > 0) {
+                extimatedLat = extimatedLat / accumulatedArea;
+                extimatedLon = extimatedLon / accumulatedArea;
 
-	@Override
-	protected String getName() {
-		return "Inverse Convex Hull Area Geolocator";
-	}
+                selectedPhoto.setExtimatedLat(extimatedLat);
+                selectedPhoto.setExtimatedLon(extimatedLon);
+
+                results.add(selectedPhoto);
+            }
+        }
+    }
+
+    @Override
+    protected String getName() {
+        return "Inverse Convex Hull Area Geolocator";
+    }
 
 }

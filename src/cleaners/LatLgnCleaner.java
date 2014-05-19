@@ -1,4 +1,5 @@
 package cleaners;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -8,60 +9,58 @@ import java.io.IOException;
 
 public class LatLgnCleaner {
 
-	public static void run(double lat, double lon,double limit ) throws IOException {
+    public static void run(double lat, double lon, double limit) throws IOException {
 
-		String fileNames[] = { "", "_missingBlocks" };
+        String fileNames[] = { "", "_missingBlocks" };
 
-		BufferedReader reader = null;
-		String dataLine;
+        BufferedReader reader = null;
+        String dataLine;
 
-		int namesIndexLatLon = 0;
+        int namesIndexLatLon = 0;
 
-		// Create output file
-		File fileLatLon = new File("latlon");
-		if (!fileLatLon.exists()) {
-			fileLatLon.createNewFile();
-		}
-		
-		//Open Writer
-		FileWriter fwLatLon = new FileWriter(fileLatLon.getAbsoluteFile());
-		BufferedWriter writer = new BufferedWriter(fwLatLon);
+        // Create output file
+        File fileLatLon = new File("latlon");
+        if (!fileLatLon.exists()) {
+            fileLatLon.createNewFile();
+        }
 
-		reader = new BufferedReader(new FileReader("C:\\SIGRDATA\\training"
-				+ fileNames[namesIndexLatLon++]+"_latlng"));
+        //Open Writer
+        FileWriter fwLatLon = new FileWriter(fileLatLon.getAbsoluteFile());
+        BufferedWriter writer = new BufferedWriter(fwLatLon);
 
-		// First Line without data
-		reader.readLine();
-		while (true) {
-			try {
-				dataLine = reader.readLine();
-				if (dataLine == null) {
-					if (namesIndexLatLon >= fileNames.length) {
-						break;
-					}
-					reader.close();
-					reader = new BufferedReader(new FileReader("C:\\SIGRDATA\\training"
-							+ fileNames[namesIndexLatLon++]+"_latlng"));
-					dataLine = reader.readLine();
-					dataLine = reader.readLine();
-				}
-				String[] latlonSplit = dataLine.split(" ");
-				double longitude = Double.parseDouble(latlonSplit[2]);
-				double latitude = Double.parseDouble(latlonSplit[1]);
-				if (latitude > lat+limit || latitude < lat-limit || longitude > lon+limit || longitude < lon-limit) {
-					continue;
-				} else {
-					writer.write(dataLine + "\n");
-				}
+        reader = new BufferedReader(new FileReader("training" + fileNames[namesIndexLatLon++] + "_latlng"));
 
-			} catch (IOException e) {
-				e.printStackTrace();
-				return;
-			}
-			writer.flush();
-		}
+        // First Line without data
+        reader.readLine();
+        while (true) {
+            try {
+                dataLine = reader.readLine();
+                if (dataLine == null) {
+                    if (namesIndexLatLon >= fileNames.length) {
+                        break;
+                    }
+                    reader.close();
+                    reader = new BufferedReader(new FileReader("training" + fileNames[namesIndexLatLon++] + "_latlng"));
+                    dataLine = reader.readLine();
+                    dataLine = reader.readLine();
+                }
+                String[] latlonSplit = dataLine.split(" ");
+                double longitude = Double.parseDouble(latlonSplit[2]);
+                double latitude = Double.parseDouble(latlonSplit[1]);
+                if (latitude > lat + limit || latitude < lat - limit || longitude > lon + limit || longitude < lon - limit) {
+                    continue;
+                } else {
+                    writer.write(dataLine + "\n");
+                }
 
-		writer.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+                return;
+            }
+            writer.flush();
+        }
 
-	}
+        writer.close();
+
+    }
 }
