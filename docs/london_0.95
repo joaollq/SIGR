@@ -1,0 +1,60 @@
+Started Random Geolocator
+Results for Random Geolocator
+Avg latitude error (in degrees) = 0.8142905409886088
+Avg longitude error (in degrees) = 0.8478585971376754
+Total images = 403783
+Avg error (in km) = 116.64512846134905
+Median error (in km) = 112.60266697914372
+Number of points within less than 50 m = 0
+Number of points between 50 m and 250 m = 0
+Number of points between 250 m and 1 km = 2
+Number of points between 1 km and 10 km = 88
+Number of points between 10 km and 50 km = 2078
+Number of points at more than 50 km km = 18021
+
+ #### 
+Started Tag Match Geolocator
+Results for Tag Match Geolocator
+Avg latitude error (in degrees) = 0.17588998896173894
+Avg longitude error (in degrees) = 0.2251185315379428
+Total images = 0
+Avg error (in km) = 27.05749157639806
+Median error (in km) = 10.212517470562902
+Number of points within less than 50 m = 320
+Number of points between 50 m and 250 m = 209
+Number of points between 250 m and 1 km = 991
+Number of points between 1 km and 10 km = 8442
+Number of points between 10 km and 50 km = 6062
+Number of points at more than 50 km km = 4131
+
+ #### 
+Started IDF Geolocator
+Results for IDF Geolocator
+Avg latitude error (in degrees) = 0.17552761337361064
+Avg longitude error (in degrees) = 0.22516798803714352
+Total images = 0
+Avg error (in km) = 26.99619592388842
+Median error (in km) = 10.523736988471192
+Number of points within less than 50 m = 355
+Number of points between 50 m and 250 m = 221
+Number of points between 250 m and 1 km = 920
+Number of points between 1 km and 10 km = 8293
+Number of points between 10 km and 50 km = 6169
+Number of points at more than 50 km km = 4190
+
+ #### 
+Started Inverse Convex Hull Area Geolocator
+Results for Inverse Convex Hull Area Geolocator
+Avg latitude error (in degrees) = 0.14380657957609919
+Avg longitude error (in degrees) = 0.1893543602056994
+Total images = 403783
+Avg error (in km) = 22.497953124490596
+Median error (in km) = 8.654099958618993
+Number of points within less than 50 m = 355
+Number of points between 50 m and 250 m = 228
+Number of points between 250 m and 1 km = 1116
+Number of points between 1 km and 10 km = 9047
+Number of points between 10 km and 50 km = 6260
+Number of points at more than 50 km km = 3141
+
+

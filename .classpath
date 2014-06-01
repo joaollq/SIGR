@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src"/>
+	<classpathentry excluding="geolocators/InverseConcaveHullAreaGeolocator.java|geolocators/TagMatchTermFrequencyGeolocator.java|utils/ConcaveHullBuilder.java" kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="C:/Users/João/workspace/SIGR/jmathplot.jar"/>
-	<classpathentry kind="lib" path="C:/Users/João/workspace/SIGR/acme.jar"/>
-	<classpathentry kind="lib" path="C:/Users/João/workspace/SIGR/jdom.jar"/>
-	<classpathentry kind="lib" path="C:/Users/João/workspace/SIGR/JTS_Test.jar"/>
-	<classpathentry kind="lib" path="C:/Users/João/workspace/SIGR/jts-1.8.jar"/>
-	<classpathentry kind="lib" path="C:/Users/João/workspace/SIGR/jtsio-1.8.jar"/>
-	<classpathentry kind="lib" path="C:/Users/João/workspace/SIGR/junit.jar"/>
-	<classpathentry kind="lib" path="C:/Users/João/workspace/SIGR/xerces.jar"/>
+	<classpathentry kind="lib" path="acme.jar"/>
+	<classpathentry kind="lib" path="jdom.jar"/>
+	<classpathentry kind="lib" path="jmathplot.jar"/>
+	<classpathentry kind="lib" path="JTS_Test.jar"/>
+	<classpathentry kind="lib" path="jts-1.8.jar"/>
+	<classpathentry kind="lib" path="jtsio-1.8.jar"/>
+	<classpathentry kind="lib" path="junit.jar"/>
 	<classpathentry kind="output" path="bin1"/>
 </classpath>

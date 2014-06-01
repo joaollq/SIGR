@@ -15,6 +15,8 @@ import java.util.Random;
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 
+import org.math.plot.Plot2DPanel;
+
 import photoRepresentation.AbstractPhotoRepresentation;
 import utils.Distance;
 
@@ -49,8 +51,11 @@ public abstract class AbstractGeolocator {
     public void run() {
         try {
             bw.write("Started " + getName() + "\n");
+            System.out.println("Started");
             InitializePhotos();
+            System.out.println("Initialized");
             GenerateTrainingSet();
+            System.out.println("Going to test");
             Test();
             bw.write("Results for " + getName() + "\n");
             AnalyseResults();
@@ -153,6 +158,9 @@ public abstract class AbstractGeolocator {
 
         plot.addLinePlot("Error", xAxis, yAxis);
         plot.setAxisLabel(1, "Km");
+        double minAxis[] = { 0d, 0d };
+        double maxAxis[] = { 45000d, 400d };
+        plot.setFixedBounds(minAxis, maxAxis);
 
         JFrame frame = new JFrame("Error plot for " + getName());
         frame.setSize(700, 700);
@@ -161,7 +169,7 @@ public abstract class AbstractGeolocator {
         BufferedImage image = new BufferedImage(700, 700, BufferedImage.TYPE_INT_RGB);
         Graphics2D graphics = image.createGraphics();
         frame.paint(graphics);
-        ImageIO.write(image, "png", new File("plots//" + graphName));
+        ImageIO.write(image, "png", new File("plots//" + graphName + "_" + getName() + ".png"));
     }
 
     protected void GenerateTrainingSet() {
